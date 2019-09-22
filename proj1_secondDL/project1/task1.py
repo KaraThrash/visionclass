@@ -24,11 +24,12 @@ import numpy as np
 import utils
 
 # low_pass filter and high-pass filter
-low_pass = [[1/16, 1/8, 1/16], [1/8, 1/4, 1/8], [1/16, 1/8, 1/16]]
-high_pass = [[-1/9, -1/9, -1/9], [-1/9, 17/9, -1/9], [-1/9, -1/9, -1/9]]
+low_pass = [[1.0/16.0, 1.0/8.0, 1.0/16.0], [1.0/8.0, 1.0/4.0, 1.0/8.0], [1.0/16.0, 1.0/8.0, 1.0/16.0]]
+#high_pass = [[-1.0/9.0, -1.0/9.0, -1.0/9.0], [-1.0/9.0, 17.0/9.0, -1.0/9.0], [-1.0/9.0, -1.0/9.0, -1.0/9.0]]
+high_pass = [[-1.0/8.0, -1.0/8.0, -1.0/8.0], [-1.0/8.0, 2.0, -1.0/8.0], [-1.0/8.0, -1.0/8.0, -1.0/8.0]]
 # high_pass2 = [[1,2,1], [-1/9, 17/9, -1/9], [-1,-2,-1]]
 # high_pass = [[1,0,1], [2, 0, -2], [1,0,-1]]
-#high_pass = [[1,1,1],[1,1,1],[1,1,1]]
+#high_pass = [[-1/9, -1/9, -1/9], [-1/9, 17/9, -1/9], [-1/9, -1/9, -1/9]]
 def parse_args():
     parser = argparse.ArgumentParser(description="cse 473/573 project 1.")
     parser.add_argument(
@@ -50,6 +51,12 @@ def parse_args():
         type=str,
         default="./results/",
         help="directory to which results are saved (do not change this arg)"
+    )
+    parser.add_argument(
+        "--img-path2",
+        type=str,
+        default="./data/ex_high-pass.jpg",
+        help="path to the image"
     )
     args = parser.parse_args()
     return args
@@ -100,7 +107,7 @@ def sharpen2d(img, kernel):
 
     Args:
         img: nested list (int), image.
-        kernel: nested list (int), kernel.
+        kernel: nested list (int), kerneimgl.
 
     Returns:
         img_conv: nested list / 9(int), convolved image.
@@ -173,31 +180,47 @@ def convolve2d(img, kernel):
     # oldimg.insert(len(oldimg),emptylist)
     # print(len(oldimg))
     # print(len(oldimg[1]))
-    accumulator = 0
+    accumulator = 0.0
     rowcount = -1
     colcount = -1
     oldimg = utils.zero_pad(oldimg,1,1)
+    kernel = utils.flip_x(kernel)
+    kernel = utils.flip_y(kernel)
     for row in img:
         rowcount = rowcount + 1
         colcount = -1
         for pixel in row:
             colcount = colcount + 1
-            accumulator = 0
-            kernalval = 0
+            accumulator = 0.0
+            kernalval = 0.0
+
+
+            # accumulator = accumulator + (oldimg[rowcount ][colcount ] * kernel[2][2])
+            # accumulator = accumulator + (oldimg[rowcount ][colcount + 1]  * kernel[2][1])
+            # accumulator = accumulator + (oldimg[rowcount ][colcount + 2] * kernel[2][0])
+            # accumulator = accumulator + (oldimg[rowcount + 1][colcount ] * kernel[1][2])
+            # accumulator = accumulator + (oldimg[rowcount + 1][colcount + 1] * kernel[1][1])
+            # accumulator = accumulator + (oldimg[rowcount + 1][colcount + 2] * kernel[1][0])
+            # accumulator = accumulator + (oldimg[rowcount + 2][colcount ] * kernel[0][2])
+            # accumulator = accumulator + (oldimg[rowcount + 2][colcount + 1] * kernel[0][1])
+            # accumulator = accumulator + (oldimg[rowcount + 2][colcount + 2] * kernel[0][0])
+            # #
             accumulator = accumulator + (oldimg[rowcount ][colcount ] * kernel[0][0])
-            kernalval = kernalval + kernel[0][0]
             accumulator = accumulator + (oldimg[rowcount ][colcount + 1]  * kernel[0][1])
             accumulator = accumulator + (oldimg[rowcount ][colcount + 2] * kernel[0][2])
             accumulator = accumulator + (oldimg[rowcount + 1][colcount ] * kernel[1][0])
-            accumulator = accumulator + (oldimg[rowcount + 1][colcount + 1] * kernel[1][1])
+            if kernel == low_pass:
+                accumulator = accumulator + (oldimg[rowcount + 1][colcount + 1] * kernel[1][1])
             accumulator = accumulator + (oldimg[rowcount + 1][colcount + 2] * kernel[1][2])
             accumulator = accumulator + (oldimg[rowcount + 2][colcount ] * kernel[2][0])
             accumulator = accumulator + (oldimg[rowcount + 2][colcount + 1] * kernel[2][1])
             accumulator = accumulator + (oldimg[rowcount + 2][colcount + 2] * kernel[2][2])
+            kernalval = kernalval + kernel[0][0]
             kernalval = kernalval + kernel[0][1]
             kernalval = kernalval + kernel[0][2]
             kernalval = kernalval + kernel[1][0]
-            kernalval = kernalval + kernel[1][1]
+            if kernel == low_pass:
+                kernalval = kernalval + kernel[1][1]
             kernalval = kernalval + kernel[1][2]
             kernalval = kernalval + kernel[2][0]
             kernalval = kernalval + kernel[2][1]
@@ -217,35 +240,39 @@ def convolve2d(img, kernel):
             #         newval = kel * pixel
             #         accumulator = newval + accumulator
 
-            newimg[rowcount ][colcount ] = (newimg[rowcount ][colcount ] * 2) - (accumulator / kernalval)
-    print(newimg[1])
-    # kernel = high_pass2
-    # rowcount = -1
-    # colcount = -1
-    # newimg2 = oldimg
-    # for row in img:
-    #     rowcount = rowcount + 1
-    #     colcount = -1
-    #     for pixel in row:
-    #         colcount = colcount + 1
-    #         accumulator = 0
-    #         accumulator = accumulator + (oldimg[rowcount - 2][colcount - 2] * kernel[0][0])
-    #         accumulator = accumulator + (oldimg[rowcount - 2][colcount - 1] * kernel[0][1])
-    #         accumulator = accumulator + (oldimg[rowcount - 2][colcount] * kernel[0][2])
-    #         accumulator = accumulator + (oldimg[rowcount - 1][colcount - 2] * kernel[1][0])
-    #         accumulator = accumulator + (oldimg[rowcount - 1][colcount - 1] * kernel[1][1])
-    #         accumulator = accumulator + (oldimg[rowcount - 1][colcount] * kernel[1][2])
-    #         accumulator = accumulator + (oldimg[rowcount][colcount - 2] * kernel[2][0])
-    #         accumulator = accumulator + (oldimg[rowcount ][colcount - 1] * kernel[2][1])
-    #         accumulator = accumulator + (oldimg[rowcount][colcount] * kernel[2][2])
-    #         # for krow in kernel:
-    #         #     for kel in krow:
-    #         #         newval = kel * pixel
-    #         #         accumulator = newval + accumulator
-    #         newimg2[rowcount ][colcount ] = (accumulator / 9) + (newimg[rowcount ][colcount ])
-    return  newimg
+            if kernel == low_pass:
+                newimg[rowcount ][colcount] = accumulator
+            if kernel == high_pass:
+                newimg[rowcount ][colcount] = (img[rowcount ][colcount ] * 2) - (accumulator / kernalval)
+    # print(newimg[35][35])
+    args = parse_args()
+    tempimg = read_image(args.img_path2)
+
+    changedimg = utils.crop(oldimg,1,256,1,256)
+    compareimages(tempimg,newimg)
+    print(len(tempimg[0]))
+    print(len(newimg[0]))
+    print(float(kernel[0][0]))
+    return newimg
     # TODO: implement this function.
     #raise NotImplementedError
+def compareimages(originalimage,newimage):
+    rowcount = -1
+    colcount = 0
+    correctcount = 0
+    for el in newimage:
+        colcount = -1
+        rowcount = rowcount + 1
+        # print(originalimage[rowcount])
+        # print(newimage[rowcount])
+        for el2 in el:
+            colcount = colcount + 1
+            if el2 == originalimage[rowcount][colcount]:
+                correctcount = correctcount + 1
+                print("correct" + str(originalimage[rowcount][colcount]) + " : " + str(el2))
+    print(correctcount)
+
+
 
 def main():
     args = parse_args()
@@ -261,7 +288,7 @@ def main():
 
     if not os.path.exists(args.rs_dir):
         os.makedirs(args.rs_dir)
-    print(kernel[0])
+
     filtered_img = convolve2d(img, kernel)
     write_image(filtered_img, os.path.join(args.rs_dir, "{}.jpg".format(args.filter)))
 
