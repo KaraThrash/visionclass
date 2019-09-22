@@ -25,10 +25,10 @@ import utils
 
 # low_pass filter and high-pass filter
 low_pass = [[1/16, 1/8, 1/16], [1/8, 1/4, 1/8], [1/16, 1/8, 1/16]]
-#high_pass = [[-1/9, -1/9, -1/9], [-1/9, 17/9, -1/9], [-1/9, -1/9, -1/9]]
+high_pass = [[-1/9, -1/9, -1/9], [-1/9, 17/9, -1/9], [-1/9, -1/9, -1/9]]
 # high_pass2 = [[1,2,1], [-1/9, 17/9, -1/9], [-1,-2,-1]]
 # high_pass = [[1,0,1], [2, 0, -2], [1,0,-1]]
-high_pass = [[1,1,1],[1,1,1],[1,1,1]]
+#high_pass = [[1,1,1],[1,1,1],[1,1,1]]
 def parse_args():
     parser = argparse.ArgumentParser(description="cse 473/573 project 1.")
     parser.add_argument(
@@ -86,9 +86,57 @@ def write_image(img, img_saving_path):
             assert np.max(img) <= 1, "Maximum pixel value {:.3f} is greater than 1".format(np.max(img))
             img = (255 * img).astype(np.uint8)
     else:
-        raise TypeError("img is neither a list nor a ndarray.")
+        raise TypeError("img is neither a list nor a ndarray.")* 2
 
     cv2.imwrite(img_saving_path, img)
+def sharpen2d(img, kernel):
+    """Convolves a given image and a given kernel.
+
+    Steps:
+        (1) flips the kernel
+        (2) pads the image # IMPORTANT
+            this step handles pixels along the border of the image, and ensures that the output image is of the same size as the input image
+        (3) calucates the convolved image using nested for loop
+
+    Args:
+        img: nested list (int), image.
+        kernel: nested list (int), kernel.
+
+    Returns:
+        img_conv: nested list / 9(int), convolved image.
+    """
+    count = 0
+    newimg = img
+    oldimg = img
+
+    print(len(oldimg))
+    print(len(oldimg[1]))
+    count  = 0
+    accumulator = 0
+    rowcount = -1
+    colcount = -1
+    oldimg = utils.zero_pad(oldimg,1,1)
+    for row in img:
+        rowcount = rowcount + 1
+        colcount = -1
+        for pixel in row:
+            colcount = colcount + 1
+            accumulator = 0
+            accumulator = accumulator + (oldimg[rowcount ][colcount ] * kernel[0][0])
+            accumulator = accumulator + (oldimg[rowcount ][colcount + 1]  * kernel[0][1])
+            accumulator = accumulator + (oldimg[rowcount ][colcount + 2] * kernel[0][2])
+            accumulator = accumulator + (oldimg[rowcount + 1][colcount ] * kernel[1][0])
+            accumulator = accumulator + (oldimg[rowcount + 1][colcount + 1] * kernel[1][1])
+            accumulator = accumulator + (oldimg[rowcount + 1][colcount + 2] * kernel[1][2])
+            accumulator = accumulator + (oldimg[rowcount + 2][colcount ] * kernel[2][0])
+            accumulator = accumulator + (oldimg[rowcount + 2][colcount + 1] * kernel[2][1])
+            accumulator = accumulator + (oldimg[rowcount + 2][colcount + 2] * kernel[2][2])
+            newimg[rowcount ][colcount ] = (newimg[rowcount ][colcount ] * 2) - (accumulator / 9)
+    print(newimg[1])
+
+    return  newimg
+    # TODO: implement this function.
+    #raise NotImplementedError
 
 def convolve2d(img, kernel):
     """Convolves a given image and a given kernel.
@@ -135,7 +183,9 @@ def convolve2d(img, kernel):
         for pixel in row:
             colcount = colcount + 1
             accumulator = 0
+            kernalval = 0
             accumulator = accumulator + (oldimg[rowcount ][colcount ] * kernel[0][0])
+            kernalval = kernalval + kernel[0][0]
             accumulator = accumulator + (oldimg[rowcount ][colcount + 1]  * kernel[0][1])
             accumulator = accumulator + (oldimg[rowcount ][colcount + 2] * kernel[0][2])
             accumulator = accumulator + (oldimg[rowcount + 1][colcount ] * kernel[1][0])
@@ -144,7 +194,14 @@ def convolve2d(img, kernel):
             accumulator = accumulator + (oldimg[rowcount + 2][colcount ] * kernel[2][0])
             accumulator = accumulator + (oldimg[rowcount + 2][colcount + 1] * kernel[2][1])
             accumulator = accumulator + (oldimg[rowcount + 2][colcount + 2] * kernel[2][2])
-
+            kernalval = kernalval + kernel[0][1]
+            kernalval = kernalval + kernel[0][2]
+            kernalval = kernalval + kernel[1][0]
+            kernalval = kernalval + kernel[1][1]
+            kernalval = kernalval + kernel[1][2]
+            kernalval = kernalval + kernel[2][0]
+            kernalval = kernalval + kernel[2][1]
+            kernalval = kernalval + kernel[2][2]
             # accumulator = accumulator + ((oldimg[rowcount - 2][colcount - 2] * 2) * kernel[0][0])
             # accumulator = accumulator + ((oldimg[rowcount - 2][colcount - 1] * 2)  * kernel[0][1])
             # accumulator = accumulator + ((oldimg[rowcount - 2][colcount] * 2) * kernel[0][2])
@@ -160,7 +217,7 @@ def convolve2d(img, kernel):
             #         newval = kel * pixel
             #         accumulator = newval + accumulator
 
-            newimg[rowcount ][colcount ] = (newimg[rowcount ][colcount ] * 2) - (accumulator / 9)
+            newimg[rowcount ][colcount ] = (newimg[rowcount ][colcount ] * 2) - (accumulator / kernalval)
     print(newimg[1])
     # kernel = high_pass2
     # rowcount = -1
