@@ -18,6 +18,7 @@ import json
 import os
 
 import utils
+import task1
 from task1 import *
 
 
@@ -72,9 +73,69 @@ def match(img, template):
         y (int): column that the character appears (starts from 0).
         max_value (float): maximum NCC value.
     """
+    rowcount = 0 #len(img)
+    colcount = 0
+    bestx = 0
+    besty = 0
+    bestavg = 10
+    #img = utils.flip_y(img)
+    print(len(img))
+    print(len(img[0]))
+    while rowcount < (len(img) - 5):
+        tempavg = avg4(img[rowcount],template[0],template[1],img[rowcount + 1],template[2],img[rowcount + 2],colcount)
+        if tempavg < bestavg:
+            bestavg = tempavg
+            besty = rowcount
+            bestx = colcount
+        colcount = colcount + 1
+        if colcount >= (len(img[0]) - 5):
+            rowcount = rowcount + 1
+            colcount = 0
+
+    print(bestavg)
+    print(bestx)
+    print(besty)
+    newimg = img
+    count = 0
+    count2 = 0
+    while count < 5:
+        count2 = 0
+        while count2 < 5:
+            newimg[besty + count][bestx + count2] = 0
+            count2 += 1
+        count += 1
+    #
+    # newimg[0][1] = img[besty][bestx + 1]
+    # newimg[0][2] = img[besty][bestx + 2]
+    # newimg[1][0] = img[besty + 1][bestx]
+    # newimg[1][1] = img[besty + 1][bestx + 1]
+    # newimg[1][2] = img[besty + 1][bestx + 2]
+    task1.write_image(newimg,  "1.png")
+    return {"x":bestx,"y":besty,"value":bestavg}
+    # for row in img:
+    #     for col in row:
+    #         np.sum((a*b))/(np.sqrt((np.sum(a**2))*(np.sum(b**2))))
     # TODO: implement this function.
     # raise NotImplementedError
     raise NotImplementedError
+
+def avg4(img1,img2,img3,img4,img5,img6,column):
+    tempint = abs(int(img1[column]) - int(img2[0]))
+    tempint = tempint + abs(int(img1[column + 1]) - int(img2[1]))
+    tempint = tempint + abs(int(img1[column + 2]) - int(img2[2]))
+    tempint = tempint + abs(int(img1[column + 3]) - int(img2[3]))
+    tempint = tempint + abs(int(img1[column + 4]) - int(img2[4]))
+    tempint = tempint + abs(int(img4[column]) - int(img3[0]))
+    tempint = tempint + abs(int(img4[column + 1]) - int(img3[1]))
+    tempint = tempint + abs(int(img4[column + 2]) - int(img3[2]))
+    tempint = tempint + abs(int(img4[column + 3]) - int(img3[3]))
+    tempint = tempint + abs(int(img4[column + 4]) - int(img3[4]))
+    tempint = tempint + abs(int(img6[column]) - int(img5[0]))
+    tempint = tempint + abs(int(img6[column + 1]) - int(img5[1]))
+    tempint = tempint + abs(int(img6[column + 2]) - int(img5[2]))
+    tempint = tempint + abs(int(img6[column + 3]) - int(img5[3]))
+    tempint = tempint + abs(int(img6[column + 4]) - int(img5[4]))
+    return tempint / 15  #( abs(img1[column] - img2[0]) + abs(img1[column + 1] - img2[1]) + abs(img1[column + 2] - img2[2]) + abs(img1[column + 3] - img2[3])  ) / 4
 
 def save_results(coordinates, template, template_name, rs_directory):
     results = {}
