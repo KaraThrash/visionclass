@@ -88,8 +88,14 @@ def flip2d(img, axis=None):
     Returns:
         flipped_img: nested list (int), the flipped image.
     """
-    # TODO: implement this function.
-    # raise NotImplementedError
-    flipped_img = flip_x(img)
-    flipped_img = flip_y(flipped_img)
+    flipped_img = img
+    if axis == 0:
+        flipped_img = flip_x(img)
+    elif axis == 1:
+        flipped_img = flip_y(img)
+    else:
+        flipped_img = flip_x(img)
+        flipped_img = flip_y(flipped_img)
+
+
     return flipped_img
