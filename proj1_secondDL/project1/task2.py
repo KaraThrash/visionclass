@@ -59,7 +59,15 @@ def norm_xcorr2d(patch, template):
     Returns:
         value (float): the NCC value between a image patch and a template.
     """
-    raise NotImplementedError
+    ncc = 0.0
+    count = -1
+    for pix in patch:
+        print("loop")
+        count = count + 1
+        ncc = ncc + pix * template[count] / np.sqrt((template[count]**2)*(pix**2))
+    # np.sum((a*b))/(np.sqrt((np.sum(a**2))*(np.sum(b**2))))
+    return ncc
+    # raise NotImplementedError
 
 def match(img, template):
     """Locates the template, i.e., a image patch, in a large image using template matching techniques, i.e., NCC.
@@ -79,8 +87,6 @@ def match(img, template):
     besty = 0
     bestavg = 10
     #img = utils.flip_y(img)
-    print(len(img))
-    print(len(img[0]))
     while rowcount < (len(img) - 5):
         tempavg = avg4(img[rowcount],template[0],template[1],img[rowcount + 1],template[2],img[rowcount + 2],colcount)
         if tempavg < bestavg:
@@ -91,36 +97,35 @@ def match(img, template):
         if colcount >= (len(img[0]) - 5):
             rowcount = rowcount + 1
             colcount = 0
+    tempint = 0.0
+    tempint = tempint + img[besty][bestx]
+    tempint = tempint + img[besty][bestx + 1]
+    tempint = tempint + img[besty][bestx + 2]
+    print(bestavg/tempint)
+    # print(bestx)
 
-    print(bestavg)
-    print(bestx)
-    print(besty)
+    ncc = (-1 + (bestavg/tempint))
+    ncc = norm_xcorr2d(img[besty][bestx :len(template[0]  )],template[0])
+
     newimg = img
     count = 0
     count2 = 0
     while count < 5:
         count2 = 0
         while count2 < 5:
-            newimg[besty + count][bestx + count2] = 0
+            newimg[besty + count][bestx + count2] = 255
             count2 += 1
         count += 1
-    #
-    # newimg[0][1] = img[besty][bestx + 1]
-    # newimg[0][2] = img[besty][bestx + 2]
-    # newimg[1][0] = img[besty + 1][bestx]
-    # newimg[1][1] = img[besty + 1][bestx + 1]
-    # newimg[1][2] = img[besty + 1][bestx + 2]
-    task1.write_image(newimg,  "1.png")
-    return {"x":bestx,"y":besty,"value":bestavg}
-    # for row in img:
-    #     for col in row:
-    #         np.sum((a*b))/(np.sqrt((np.sum(a**2))*(np.sum(b**2))))
-    # TODO: implement this function.
-    # raise NotImplementedError
-    raise NotImplementedError
+
+    # task1.write_image(newimg,  "1.png")
+    # json.dumps({"x":1,"y":2,"value":(-1 + (bestavg/tempint))})
+    return bestx,besty,(-1 + (bestavg/tempint))
+    # {"x":"1","y":"2","value":str(-1 + (bestavg/tempint))}
+    # {"x":1,"y":2,"value":(-1 + (bestavg/tempint))}
+
 
 def avg4(img1,img2,img3,img4,img5,img6,column):
-    tempint = abs(int(img1[column]) - int(img2[0]))
+    tempint = float(abs(int(img1[column]) - int(img2[0])))
     tempint = tempint + abs(int(img1[column + 1]) - int(img2[1]))
     tempint = tempint + abs(int(img1[column + 2]) - int(img2[2]))
     tempint = tempint + abs(int(img1[column + 3]) - int(img2[3]))
@@ -135,7 +140,7 @@ def avg4(img1,img2,img3,img4,img5,img6,column):
     tempint = tempint + abs(int(img6[column + 2]) - int(img5[2]))
     tempint = tempint + abs(int(img6[column + 3]) - int(img5[3]))
     tempint = tempint + abs(int(img6[column + 4]) - int(img5[4]))
-    return tempint / 15  #( abs(img1[column] - img2[0]) + abs(img1[column + 1] - img2[1]) + abs(img1[column + 2] - img2[2]) + abs(img1[column + 3] - img2[3])  ) / 4
+    return tempint / 15.0  #( abs(img1[column] - img2[0]) + abs(img1[column + 1] - img2[1]) + abs(img1[column + 2] - img2[2]) + abs(img1[column + 3] - img2[3])  ) / 4
 
 def save_results(coordinates, template, template_name, rs_directory):
     results = {}
