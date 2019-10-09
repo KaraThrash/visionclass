@@ -27,12 +27,12 @@ def parse_args():
     parser.add_argument(
         "--img-path",
         type=str,
-        default="./data/proj1-task2.jpg",
+        default="./data/task2-test.jpg",
         help="path to the image")
     parser.add_argument(
         "--template-path",
         type=str,
-        default="./data/proj1-task2-template.jpg",
+        default="./data/template-test.jpg",
         help="path to the template"
     )
     parser.add_argument(
@@ -105,7 +105,7 @@ def match(img, template):
     # print(bestx)
 
     ncc = (-1 + (bestavg/tempint))
-    ncc = norm_xcorr2d(img[besty][bestx :len(template[0]  )],template[0])
+    # ncc = norm_xcorr2d(img[besty][bestx :len(template[0]  )],template[0])
 
     newimg = img
     count = 0
