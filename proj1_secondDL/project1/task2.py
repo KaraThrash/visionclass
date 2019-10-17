@@ -117,7 +117,7 @@ def match(img, template):
             count2 += 1
         count += 1
 
-    # task1.write_image(newimg,  "1.png")
+    task1.write_image(newimg,  "1.png")
     # json.dumps({"x":1,"y":2,"value":(-1 + (bestavg/tempint))})
     return bestx,besty,(-1 + (bestavg/tempint))
     # {"x":"1","y":"2","value":str(-1 + (bestavg/tempint))}
