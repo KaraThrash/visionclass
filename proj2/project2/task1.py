@@ -75,6 +75,10 @@ def solution(input_points, t, d, k):
     outliners = 0
     countp = -1
     countq = 0
+    inlinelist = []
+    outlinelist = []
+    tempinlinelist = []
+    tempoutlinelist = []
     for point_q in nodelist:
         countq = -1
         countp = countp + 1
@@ -85,6 +89,8 @@ def solution(input_points, t, d, k):
             countq = countq + 1
 
             if point_q["name"] != point_p["name"]:
+                tempinlinelist = []
+                tempoutlinelist = []
                 # slope = (point_p["value"][1]-point_q["value"][1]) / (point_p["value"][1] - point_q["value"][0])
                 inliners = 0
                 outliners = 0
@@ -96,8 +102,11 @@ def solution(input_points, t, d, k):
                 # print("A:",A,"B",B,"C:",C)
                 # print("", point_p["value"], "", point_q["value"])
                 countd = 0
+                tempinlinelist.append(point_p["name"])
+                tempinlinelist.append(point_q["name"])
                 for point_d in nodelist:
                     if point_d["name"] != point_p["name"] and point_q["name"] != point_d["name"]:
+
                         countd = countd + 1
                         # print("point D:", countd)
                         # print(abs(A*point_d["value"][0] + B*point_d["value"][1] + C))
@@ -106,7 +115,7 @@ def solution(input_points, t, d, k):
                         # A = point_q["value"][1] - point_p["value"][1]
                         # B = point_p["value"][0] - point_q["value"][0]
                         # C = (A*point_p["value"][0]) + (B*point_p["value"][1])
-                        d = (abs(A*point_d["value"][0] + B*point_d["value"][1] + C)) / (math.sqrt(A*A + B*B))
+                        dist = (abs(A*point_d["value"][0] + B*point_d["value"][1] + C)) / (math.sqrt(A*A + B*B))
                         # print("for point ", point_d["value"][0],",",point_d["value"][1], "D: ", d)
 
                         # slope = (y1-y2)/(x1-x2)
@@ -114,34 +123,42 @@ def solution(input_points, t, d, k):
                             slope = (point_p["value"][1] - point_q["value"][1]) / (point_p["value"][0] - point_q["value"][0])
                             # yintercept = (x1*y2 - x2*y1)/(x1-x2)
                             yintercept = ((point_p["value"][0] * point_q["value"][1]) - (point_q["value"][0] * point_p["value"][1])) / (point_p["value"][0] - point_q["value"][0] )
-                            d = math.sqrt( ((yintercept + (slope * point_d["value"][0]) - point_d["value"][1]) * (yintercept + (slope * point_d["value"][0]) - point_d["value"][1])) /((slope * slope) + 1)  )
+                            dist = math.sqrt( ((yintercept + (slope * point_d["value"][0]) - point_d["value"][1]) * (yintercept + (slope * point_d["value"][0]) - point_d["value"][1])) /((slope * slope) + 1)  )
 
-                            if d <= 0.5:
+                            if dist <= t:
                                 inliners = inliners + 1
-                                inlineavg = inlineavg + d
+                                inlineavg = inlineavg + dist
+                                tempinlinelist.append(point_d["name"])
                             else:
                                 # print("outlier",point_d["value"],"D: ", d)
                                 outliners = outliners + 1
+                                tempoutlinelist.append(point_d["name"])
                 # print(point_q,point_p)
                 # print("inliners:",inliners,"avg",inlineavg)
                 # print("outliners:",outliners)
 
-                if inliners > 3:
-                    avglist.append(("p: ",point_p["name"],"q: ",point_q["name"],":inliners:",inliners," : outliners: ",outliners ))
+                if inliners >= d:
+                    inlineavg = inlineavg / inliners
+                    # avglist.append(("p: ",point_p["name"],"q: ",point_q["name"],":inliners:",inliners," : outliners: ",outliners ))
                     # inlineavg = inlineavg / (inliners )
 
-                    if inliners > bestinline :
+                    if inlineavg < bestinlineavg :
                         # bestinlineavg = inlineavg
-                        bestinline = inliners
-                        bestline = (point_p["value"][0],point_p["value"][1],point_q["value"][0],point_q["value"][1])
-
-    print("Bestline ", bestline)
-    # print("avg ", bestinlineavg)
-    print("inliners ", bestinline)
+                        # print("Better! old average: ",bestinlineavg," new average: ",inlineavg)
+                        bestinlineavg = inlineavg
+                        inlinelist = tempinlinelist
+                        outlinelist = tempoutlinelist
+                    # else:
+                    #     print("WORSE! old average: ",bestinlineavg," new average: ",inlineavg)
+                # else:
+                    # print("no D! old average: ",bestinlineavg," new average: ",inlineavg)
+    # print("Bestline ", bestline)
+    # # print("avg ", bestinlineavg)
+    # print("inliners ", bestinline)
     # print(avglist)
-    for el in avglist:
-        print(el)
-    return (1,1)
+    # for el in avglist:
+    #     print(el)
+    return (inlinelist,outlinelist)
     # raise NotImplementedError
 
 
@@ -150,10 +167,7 @@ if __name__ == "__main__":
                     {'name': 'c', 'value': (3.0, 1.0)}, {'name': 'd', 'value': (0.0, 3.0)},
                     {'name': 'e', 'value': (1.0, 2.0)}, {'name': 'f', 'value': (1.5, 1.5)},
                     {'name': 'g', 'value': (1.0, 1.0)}, {'name': 'h', 'value': (1.5, 2.0)}]
-    # input_points = [(0.0, 1.0), (2.0, 1.0),
-    #                 (3.0, 1.0),  (0.0, 3.0),
-    #                  (1.0, 2.0), (1.5, 1.5),
-    #                 (1.0, 1.0),(1.5, 2.0)]
+
     t = 0.5
     d = 3
     k = 100

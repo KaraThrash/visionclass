@@ -24,9 +24,9 @@ def solution(left_img, right_img):
     :return: you need to return the result image which is stitched by left_img and right_img
     """
 
-    img1keypoints, des1 = cv2.xfeatures2d.SIFT_create().detectAndCompute(left_img,None)
-    img2keypoints, des2 = cv2.xfeatures2d.SIFT_create().detectAndCompute(right_img,None)
-    newimage = left_img 
+    img1keypoints, des1 = cv2.xfeatures2d.SIFT_create().detectAndCompute(right_img,None)
+    img2keypoints, des2 = cv2.xfeatures2d.SIFT_create().detectAndCompute(left_img,None)
+    newimage = left_img
 
     matches = cv2.BFMatcher().knnMatch(des1,des2,2)
 
@@ -63,25 +63,28 @@ def solution(left_img, right_img):
     # np.resize(newimage[0],len(newimage[0]) * 2)
     # print(len(newimage[0]))
     # print(len(newimage[0]))
+    stitchimage = False
     if valid > 1:
+        stitchimage = True
         for pixel in hits:
             orig.append(img1keypoints[pixel.queryIdx].pt)
             dest.append(img2keypoints[pixel.trainIdx].pt)
 
+    if stitchimage == True:
         orig = np.float32(orig)
         dest = np.float32(dest)
-        M, mask = cv2.findHomography(orig, dest, cv2.RANSAC, 5.0)
+        matrix, mask = cv2.findHomography(orig, dest, cv2.RANSAC, 5.0)
         print(left_img.shape)
-        h,w,c = left_img.shape
+        height = left_img.shape[0]
+        width = left_img.shape[1]
+        newimage = cv2.warpPerspective(right_img,matrix,(left_img.shape[1] + width, left_img.shape[0] ))
 
-        newimage = cv2.warpPerspective(left_img,M,(left_img.shape[1] + w, left_img.shape[0] ))
 
-
-        newimage[0:left_img.shape[0],0:left_img.shape[1]] = right_img
-
+        newimage[0:left_img.shape[0],0:left_img.shape[1]] = left_img
+        return newimage
     else:
         print("no match")
-    return newimage
+
     # raise NotImplementedError
 
 if __name__ == "__main__":
