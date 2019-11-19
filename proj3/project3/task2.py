@@ -141,15 +141,17 @@ def median_filter(img):
             colcount = colcount + 1
             pixelavg = 0
             pixelavgcount = 0
-            pixelavg = pixelavg + paddedimg[rowcount ][colcount ]
-            pixelavg = pixelavg + paddedimg[rowcount ][colcount + 1]
-            pixelavg = pixelavg + paddedimg[rowcount ][colcount + 2]
-            pixelavg = pixelavg + paddedimg[rowcount + 1][colcount ]
-            pixelavg = pixelavg + paddedimg[rowcount + 1][colcount + 1]
-            pixelavg = pixelavg + paddedimg[rowcount + 1][colcount + 2]
-            pixelavg = pixelavg + paddedimg[rowcount + 2][colcount ]
-            pixelavg = pixelavg + paddedimg[rowcount + 2][colcount + 1]
-            pixelavg = pixelavg + paddedimg[rowcount + 2][colcount + 2]
+            medianarray = []
+
+            medianarray.append(paddedimg[rowcount ][colcount ])
+            medianarray.append(paddedimg[rowcount ][colcount + 1])
+            medianarray.append( paddedimg[rowcount ][colcount + 2])
+            medianarray.append( paddedimg[rowcount + 1][colcount ])
+            medianarray.append( paddedimg[rowcount + 1][colcount + 1])
+            medianarray.append( paddedimg[rowcount + 1][colcount + 2])
+            medianarray.append( paddedimg[rowcount + 2][colcount ])
+            medianarray.append( paddedimg[rowcount + 2][colcount + 1])
+            medianarray.append( paddedimg[rowcount + 2][colcount + 2])
             # pixelavg = pixelavg + paddedimg[rowcount + 1][colcount + 1]
 
             if paddedimg[rowcount ][colcount ] != 0:
@@ -171,13 +173,48 @@ def median_filter(img):
             if  paddedimg[rowcount + 2][colcount + 2] != 0:
                 pixelavgcount = pixelavgcount + 1
 
-
+            medianarray.sort()
             pixelavg = pixelavg / pixelavgcount
             # denoiserow.append(pixelavg)
-            if pixelavg < pixel:
-                denoiseimg[rowcount][colcount] = pixelavg
-            else:
-                denoiseimg[rowcount][colcount] = pixel
+            denoiseimg2[rowcount][colcount] =  medianarray[4]
+
+            # pixelavg = pixelavg + paddedimg[rowcount ][colcount ]
+            # pixelavg = pixelavg + paddedimg[rowcount ][colcount + 1]
+            # pixelavg = pixelavg + paddedimg[rowcount ][colcount + 2]
+            # pixelavg = pixelavg + paddedimg[rowcount + 1][colcount ]
+            # pixelavg = pixelavg + paddedimg[rowcount + 1][colcount + 1]
+            # pixelavg = pixelavg + paddedimg[rowcount + 1][colcount + 2]
+            # pixelavg = pixelavg + paddedimg[rowcount + 2][colcount ]
+            # pixelavg = pixelavg + paddedimg[rowcount + 2][colcount + 1]
+            # pixelavg = pixelavg + paddedimg[rowcount + 2][colcount + 2]
+            # # pixelavg = pixelavg + paddedimg[rowcount + 1][colcount + 1]
+            #
+            # if paddedimg[rowcount ][colcount ] != 0:
+            #     pixelavgcount = pixelavgcount + 1
+            # if paddedimg[rowcount ][colcount + 1] != 0:
+            #     pixelavgcount = pixelavgcount + 1
+            # if  paddedimg[rowcount ][colcount + 2] != 0:
+            #     pixelavgcount = pixelavgcount + 1
+            # if  paddedimg[rowcount + 1][colcount ] != 0:
+            #     pixelavgcount = pixelavgcount + 1
+            # if  paddedimg[rowcount + 1][colcount + 1] != 0:
+            #     pixelavgcount = pixelavgcount + 1
+            # if  paddedimg[rowcount + 1][colcount + 2] != 0:
+            #     pixelavgcount = pixelavgcount + 1
+            # if paddedimg[rowcount + 1][colcount ] != 0:
+            #     pixelavgcount = pixelavgcount + 1
+            # if  paddedimg[rowcount + 2][colcount + 1] != 0:
+            #     pixelavgcount = pixelavgcount + 1
+            # if  paddedimg[rowcount + 2][colcount + 2] != 0:
+            #     pixelavgcount = pixelavgcount + 1
+            #
+            #
+            # pixelavg = pixelavg / pixelavgcount
+            # # denoiserow.append(pixelavg)
+            # if pixelavg < pixel:
+            #     denoiseimg[rowcount][colcount] = pixelavg
+            # else:
+            #     denoiseimg[rowcount][colcount] = pixel
 
     utils.write_image(denoiseimg2,'results/task2_result2.jpg')
     # cv2.imwrite('results/task2_result.jpg',denoiseimg)
