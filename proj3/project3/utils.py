@@ -19,7 +19,7 @@ def write_image(img, img_saving_path):
             img = (255 * img).astype(np.uint8)
     else:
         raise TypeError("img is not a ndarray.")
-    
+
     cv2.imwrite(img_saving_path, img)
 
 def zero_pad(img, pwx, pwy):
@@ -28,4 +28,4 @@ def zero_pad(img, pwx, pwy):
     padded_img = np.zeros((img.shape[0]+2*pwy, img.shape[1]+2*pwx))
     for i in range(0, img.shape[0]):
         padded_img[pwy+i][pwx: img.shape[1]+pwx] = np.copy(img[i][:])
-    return padded_img     
+    return padded_img
