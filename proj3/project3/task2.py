@@ -26,7 +26,7 @@ def median_filter(img):
     Return: Filtered image.
     """
     # TODO: implement this function.
-    utils.zero_pad(img,len(img[0]),len(img))
+    # paddedimg = utils.zero_pad(img,len(img[0]),len(img))
     count = len(img[0])
     padrow = []
     padrow2 = []
@@ -95,15 +95,45 @@ def median_filter(img):
                 pixelavgcount = pixelavgcount + 1
 
 
-            pixelavg = pixelavg / 9
+            pixelavg = pixelavg / pixelavgcount
             # denoiserow.append(pixelavg)
-            denoiseimg[rowcount][colcount] = pixelavg
+            if pixelavg < pixel:
+                denoiseimg[rowcount][colcount] = pixelavg
+            else:
+                denoiseimg[rowcount][colcount] = pixel
+
+
+
     utils.write_image(denoiseimg,'results/task2_result.jpg')
-    img = denoiseimg
+
+    count = len(img[0])
+    padrow = []
+    padrow2 = []
+    paddedimg = []
+    padrow.append(0)
+    padrow2.append(0)
+    padrow.append(0)
+    padrow2.append(0)
+    while count > 0:
+        padrow.append(0)
+        padrow2.append(0)
+        count = count - 1
+    paddedimg.append(padrow)
+    for row in denoiseimg:
+        newrow = []
+        newrow.append(0)
+        paddedimg.append(newrow)
+
+        for pixel in row:
+            newpixel = pixel
+            newrow.append(newpixel)
+        newrow.append(0)
+    paddedimg.append(padrow2)
+
+    denoiseimg2 = img
     rowcount = -1
     colcount = -1
     for row in img:
-        denoiserow = []
         # denoiseimg.append(denoiserow)
         rowcount = rowcount + 1
         colcount = -1
@@ -144,9 +174,12 @@ def median_filter(img):
 
             pixelavg = pixelavg / pixelavgcount
             # denoiserow.append(pixelavg)
-            denoiseimg[rowcount][colcount] = math.sqrt(pixelavg)
+            if pixelavg < pixel:
+                denoiseimg[rowcount][colcount] = pixelavg
+            else:
+                denoiseimg[rowcount][colcount] = pixel
 
-    utils.write_image(denoiseimg,'results/task2_result2.jpg')
+    utils.write_image(denoiseimg2,'results/task2_result2.jpg')
     # cv2.imwrite('results/task2_result.jpg',denoiseimg)
 
 def mse(img1, img2):
