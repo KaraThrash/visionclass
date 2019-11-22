@@ -37,7 +37,7 @@ def kmeans(img,k):
     # NOTE: max is 245
 
     cluster1 = 0
-    clusterb = 245
+    clusterb = 255
     avg1 = 0
     distsuma = 0
     count1 = 0
@@ -70,16 +70,16 @@ def kmeans(img,k):
                     distsumb = distsumb + abs(pixel - clusterb)
     if avg1 > 0:
         cluster1 = cluster1 + 1
-        if cluster1 > 245:
-            cluster1 = 245
+        if cluster1 > 255:
+            cluster1 = 255
     elif avg1 < 0:
         cluster1 = cluster1 - 1
         if cluster1 < 0:
             cluster1 = 0
     if avgb > 0:
         clusterb = clusterb + 1
-        if clusterb > 245:
-            clusterb = 245
+        if clusterb > 255:
+            clusterb = 255
     elif avgb < 0:
         clusterb = clusterb - 1
         if clusterb < 0:
@@ -87,25 +87,29 @@ def kmeans(img,k):
 
 
     centers, labels, bestsumdistance ,distsuma,distsumb = kmeans2(img,k,cluster1,clusterb,count1,countb,distsuma,distsumb)
+    bestcenters = centers
+    bestlabels = labels
     iteratecount = 0
     print(bestsumdistance)
-    while iteratecount < 25:
+    while iteratecount < 125:
         iteratecount = iteratecount + 1
-        cluster1 = cluster1 + 4
-        clusterb = clusterb - 4
-        if cluster1 >= 245:
-            cluster1 = 244
+        cluster1 = cluster1 + 1
+        clusterb = clusterb - 1
+        if cluster1 >= 255:
+            cluster1 = 255
         if clusterb < 0:
             clusterb = 0
-        if clusterb >= 245:
-            clusterb = 244
+        if clusterb >= 255:
+            clusterb = 255
         if cluster1 < 0:
             cluster1 = 0
         centers, labels, newsumdistance ,distsuma,distsumb = kmeans2(img,k,cluster1,clusterb,count1,countb,distsuma,distsumb)
         if newsumdistance < bestsumdistance:
             bestsumdistance = newsumdistance
+            bestcenters = centers
+            bestlabels = labels
 
-    return (centers, labels, bestsumdistance)
+    return (bestcenters, bestlabels, bestsumdistance)
 
 def kmeans2(img,k,cluster1,clusterb,lastcount1,lastcountb,distsuma,distsumb):
 
@@ -131,32 +135,32 @@ def kmeans2(img,k,cluster1,clusterb,lastcount1,lastcountb,distsuma,distsumb):
                 distsuma = distsuma + abs(pixel - cluster1)
     if avg1 > 0:
         cluster1 = cluster1 + 1
-        if cluster1 > 245:
-            cluster1 = 245
+        if cluster1 > 255:
+            cluster1 = 255
     elif avg1 < 0:
         cluster1 = cluster1 - 1
         if cluster1 < 0:
             cluster1 = 0
     if avgb > 0:
         clusterb = clusterb + 1
-        if clusterb > 245:
-            clusterb = 245
+        if clusterb > 255:
+            clusterb = 255
     elif avgb < 0:
         clusterb = clusterb - 1
         if clusterb < 0:
             clusterb = 0
     if avg1 > 0:
         cluster1 = cluster1 + 1
-        if cluster1 > 245:
-            cluster1 = 245
+        if cluster1 > 255:
+            cluster1 = 255
     elif avg1 < 0:
         cluster1 = cluster1 - 1
         if cluster1 < 0:
             cluster1 = 0
     if avgb > 0:
         clusterb = clusterb + 1
-        if clusterb > 245:
-            clusterb = 245
+        if clusterb > 255:
+            clusterb = 255
     elif avgb < 0:
         clusterb = clusterb - 1
         if clusterb < 0:
