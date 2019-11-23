@@ -84,8 +84,9 @@ def kmeans(img,k):
         clusterb = clusterb - 1
         if clusterb < 0:
             clusterb = 0
-
-
+# {"distance": 5437045, "centers": [94, 161], "time": 115.57173490524292}
+# {"distance": 5437045, "centers": [94, 161], "time": 64.89245796203613}
+# {"distance": 5439599, "centers": [95, 160], "time": 27.1616051197052}
     centers, labels, bestsumdistance ,distsuma,distsumb = kmeans2(img,k,cluster1,clusterb,count1,countb,distsuma,distsumb)
     bestcenters = centers
     bestlabels = labels
@@ -93,8 +94,8 @@ def kmeans(img,k):
     print(bestsumdistance)
     while iteratecount < 125:
         iteratecount = iteratecount + 1
-        cluster1 = cluster1 + 1
-        clusterb = clusterb - 1
+        cluster1 = iteratecount
+        clusterb = 255 - iteratecount
         if cluster1 >= 255:
             cluster1 = 255
         if clusterb < 0:
@@ -179,7 +180,8 @@ def visualize(centers,labels):
     Return: Segmentation map.
     """
     # TODO: implement this function.
-    newimg = img
+    newimg = labels
+    # newimg = [[0] * len(labels[0])] * len(labels)
     rowcount = -1
     colcount = 0
     for row in labels:
