@@ -83,7 +83,7 @@ def median_filter(img):
             denoiseimg2[rowcount][colcount] =  medianarray[4]
 
 
-    utils.write_image(denoiseimg2,'results/task2_result2.jpg')
+    # utils.write_image(denoiseimg2,'results/task2_result2.jpg')
     return denoiseimg2
     # cv2.imwrite('results/task2_result.jpg',denoiseimg)
 
@@ -106,9 +106,9 @@ def mse(img1, img2):
             temp = img1[rowcount][colcount] - img2[rowcount][colcount]
             temp = temp * temp
             total = temp + total
-    print("Total: ",total)
+    # print("Total: ",total)
     avg = total / (rowcount * colcount)
-    print("avg: ",avg)
+    # print("avg: ",avg)
     return avg
 if __name__ == "__main__":
     img = utils.read_image('lenna-noise.png')
